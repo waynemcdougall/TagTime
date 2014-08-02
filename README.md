@@ -137,6 +137,48 @@ There is an Android app available [on Google
 Play](https://play.google.com/store/apps/details?id=bsoule.tagtime).
 The source and build instructions are in `src/and`.
 
+# Email Bot (via Mailgun)
+
+This is mostly intended as a stopgap measure for iOS users who want to get 
+pings on their phone. You'll be pinged by an email bot and will enter tags 
+by replying to the ping emails. After setting things up, you'll have to run 
+or schedule a Python script `update.py` to schedule a new batch of ping 
+emails, write your pending replies to the TagTime log file, and send your 
+data to Beeminder.
+
+The files are the following (Python 2.7):
+
+* `setup.py` -- initial setup
+* `update.py` -- reads and logs replies, schedules pings, sends to Beeminder
+* `mailgun.py` -- interaction with Mailgun APIs
+* `pings.py` -- random number generator for ping times; cf. `util.pl`
+* `misc.py` -- miscellaneous functions
+* `settings.py` -- user-specific settings for Mailgun and Beeminder
+* `prevping.py`	-- for debugging, displays latest ping time
+
+Here's how to set this up:
+
+0. If you're new to TagTime, set it up as per instructions above. You don't 
+need to run the daemon unless you want to answer pings on your computer. The 
+only thing you really need to get working is sending data to Beeminder. 
+Either run the daemon and answer some pings, or make a `username.log` file 
+with some test pings (see format in `samplelog.txt`), then run `perl 
+beeminder.pl username.log username/slug` and check if your Beeminder graph 
+is updated correctly.
+1. Sign up for a Mailgun account.
+2. Put the required email, Mailgun, and Beeminder info into `settings.py`.
+3. Create a Mailgun Route with filter expression `match_recipient("tagtime@
+sandbox12345.mailgun.org")` (or whatever you set `bot_email` in 
+`settings.py`) and action `store()`.
+4. Run `python setup.py`.
+5. Schedule or manually run `python update.py` about once daily or more 
+frequently.
+
+You'll probably want to enable push notifications on incoming emails on your 
+phone. To limit push notifications to TagTime pings, get an email app that 
+you're not already using, link it to an email account you'll only use for 
+TagTime, and enable push notifications only for this email app.
+
 # Google Group
 
 For discussion and questions: 
