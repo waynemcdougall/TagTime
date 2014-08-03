@@ -144,7 +144,9 @@ pings on their phone. You'll be pinged by an email bot and will enter tags
 by replying to the ping emails. After setting things up, you'll have to run 
 or schedule a Python script `update.py` to schedule a new batch of ping 
 emails, write your pending replies to the TagTime log file, and send your 
-data to Beeminder.
+data to Beeminder. Note that the emails are meant to be the sole data source
+for your log file. Combining email data entry with the daemon or anything else
+that writes to your log file WILL result in errors.
 
 The files are the following (Python 2.7):
 
@@ -158,13 +160,12 @@ The files are the following (Python 2.7):
 
 Here's how to set this up:
 
-0. If you're new to TagTime, set it up as per instructions above. You don't 
-need to run the daemon unless you want to answer pings on your computer. The 
+0. If you're new to TagTime, set it up as per instructions above. The 
 only thing you really need to get working is sending data to Beeminder. 
-Either run the daemon and answer some pings, or make a `username.log` file 
-with some test pings (see format in `samplelog.txt`), then run `perl 
-beeminder.pl username.log username/slug` and check if your Beeminder graph 
-is updated correctly.
+To see if this works, either run the daemon and answer some pings, or make 
+a `username.log` file with some test pings (see format in `samplelog.txt`), 
+then run `perl beeminder.pl username.log username/slug` and check if your 
+Beeminder graph is updated correctly.
 1. Sign up for a Mailgun account.
 2. Put the required email, Mailgun, and Beeminder info into `settings.py`.
 3. Create a Mailgun Route with filter expression `match_recipient("tagtime@
@@ -173,6 +174,13 @@ sandbox12345.mailgun.org")` (or whatever you set `bot_email` in
 4. Run `python setup.py`.
 5. Schedule or manually run `python update.py` about once daily or more 
 frequently.
+
+At the moment the email bot will not work well in combination with anything 
+else that writes to the log file, so you should turn off the Perl daemon 
+after you've set up the email bot. Note also that presently there is very
+little error handling. For this reason, run update.py manually at first 
+rather than scheduling it, and pay close attention to correct syntax in your 
+ping replies.
 
 You'll probably want to enable push notifications on incoming emails on your 
 phone. To limit push notifications to TagTime pings, get an email app that 
