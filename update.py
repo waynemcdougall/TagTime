@@ -7,6 +7,7 @@ import io
 import string
 import sys
 import os
+#import ftplib  # for FTP upload only
 
 import misc
 import mailgun
@@ -123,6 +124,22 @@ with io.open('%s.log' % settings.username, 'a', newline = '') as f:
   f.write('\n'.join(log_lines) + '\n')
 
 print 'Updated %s.log file.' % settings.username
+
+# Optional: Upload log file to FTP server (used by the Shiny app)
+# you'll have to import ftplib (see above)
+#with io.open('%s.log' % settings.username, 'r', newline = '') as f:
+#  ftp = ftplib.FTP("ftp.your.server")  # CHANGEME
+#  ftp.login("username", "password")  # CHANGEME
+#  ftp.storlines("STOR path/to/destination", f)  # CHANGEME
+#print 'Uploaded %s.log to FTP server.' % settings.username
+
+# Optional: Copy log file to another location (e.g. Dropbox public folder)
+#alt_path = 'alternative\path\to\log\username.log'  # CHANGEME
+#with io.open('%s.log' % settings.username, 'r', newline = '') as f:
+#  logfile = f.read()
+#with io.open(alt_path, 'w', newline = '') as f:
+#  f.write(logfile)
+#print 'Copied log file to %s' % alt_path
 
 # Schedule upcoming emails that aren't already pending
 pending = [x for x in pending if x not in log_timestamps]
