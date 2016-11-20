@@ -28,11 +28,25 @@ def generatecode():
     if len(rows) == 0:
       return code
 
+def makeinfomessage():
+  cursor.execute('select count(1) from pings where response_time is null')
+  result=cursor.fetchone()
+  number=result[0]
+  if number==0:
+    return ""
+  cursor.execute('select code from pings where response_time is null limit 1')
+  result=cursor.fetchone()
+  first_code=result[0]
+  return "Unanswered pings:"+str(number)+" First code:%04d\n" % first_code
+  
 def issueping(pingtime):
   code=generatecode()
+  info=makeinfomessage()
   besttag,tags = besttagguesses()
-  dm = ("What are you doing on "+time.strftime("%a at %H:%M:%S", time.localtime(pingtime)) + "? Code:" + code
-     + "\nEnter tag or" + tags)
+  dm = (info
+   + "What are you doing on "+time.strftime("%a at %H:%M:%S", time.localtime(pingtime)) 
+   + "? Code:" + code
+   + "\nEnter tag or" + tags)
   storeping (pingtime,besttag,code) 
   while 1:
     try:
@@ -50,16 +64,21 @@ def storetag(tag,username):
   cursor.execute('update pings set response=?,response_time=? where response_time is null order by time limit 1',(tag,time.time()))
   conn.commit()
 
-#https://www.digitalocean.com/community/tutorials/how-to-authenticate-a-python-application-with-twitter-using-tweepy-on-ubuntu-14-04
-# cfg = { 
-#    "consumer_key"        : "www",
-#    "consumer_secret"     : "xxx",
-#    "access_token"        : "yyy",
-#    "access_token_secret" : "zzz"
-#    }
+"""
+twitter_secrets.py
 
-import twitter_secrets.py
-api = get_api(cfg)
+# https://www.digitalocean.com/community/tutorials/how-to-authenticate-a-python-application-with-twitter-using-tweepy-on-ubuntu-14-04
+
+cfg = { 
+    "consumer_key"        : "www",
+    "consumer_secret"     : "xxx",
+    "access_token"        : "yyy",
+    "access_token_secret" : "zzz"
+    }
+"""
+
+import twitter_secrets
+api = get_api(twitter_secrets.cfg)
 gap = 45 * 60 # average gap between pings of 45 minutes
 
 username="waynemcdougall"
